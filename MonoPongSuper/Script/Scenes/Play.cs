@@ -1,0 +1,111 @@
+﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
+using System.Diagnostics;
+using System;
+using MonoPongSuper.Script.Controller;
+using MonoPongSuper.Script.Game;
+using MonoPongSuper.Script.Font;
+using System.Net.Http;
+using Microsoft.Xna.Framework.Content;
+using System.Reflection.Metadata;
+
+namespace MonoPongSuper.Script.Scenes
+{
+    public static class Play
+    {
+        private static Texture2D rectDebug;
+        private static bool showDebug = false;
+        private static bool showScore = true;
+
+        private static Texture2D bg;
+
+        private static Rectangle[] screenBounds = new Rectangle[4]; // Screen boundaries. 0 = Left, 1 = Right, 2 = Upper, 3 = Lower
+
+        private static Paddle[] players = new Paddle[2];
+        private static PlayerController[] playersInp = new PlayerController[2];
+        private static int[] scores = new int[2];
+
+        private static Ball ball;
+
+        public static int scoreToWin;
+        public static void Initialize(ContentManager cn) 
+        {
+            screenBounds[0] = new Rectangle(0, 0, 6, 180); // left of screen boundary ( goal )
+            screenBounds[1] = new Rectangle(314, 0, 6, 180); // right of screen boundary ( goal )
+            screenBounds[2] = new Rectangle(0, 0, 320, 6); // top of screen boundary
+            screenBounds[3] = new Rectangle(0, 174, 320, 6); // bottom of screen boundary
+        }
+
+        public static void Load(ContentManager cn) 
+        {
+            bg = cn.Load<Texture2D>("image/gamefield");
+            rectDebug = cn.Load<Texture2D>("image/ballSuper");
+
+            Fonts.fonts[0] = cn.Load<SpriteFont>("font/debug");
+            Fonts.fonts[1] = cn.Load<SpriteFont>("font/title");
+
+            Texture2D testImage = cn.Load<Texture2D>("image/test");
+            Texture2D paddleImg = cn.Load<Texture2D>("image/paddleSuper");
+            Texture2D ballImg = cn.Load<Texture2D>("image/ballSuper");
+
+            float maxSpeed = 3f;
+
+            players[0] = new Paddle(paddleImg, new Vector2(10, 90), maxSpeed, screenBounds);
+            playersInp[0] = new PlayerController(1, players[0]);
+
+            players[1] = new Paddle(paddleImg, new Vector2(306, 90), maxSpeed, screenBounds);
+            playersInp[1] = new PlayerController(2, players[1]);
+
+            ball = new Ball(ballImg, new Vector2(160, 90), 2f, players, screenBounds);
+        }
+
+        public static void Update(GameTime gt) 
+        {
+            foreach (Paddle player in players)
+            {
+                player.Update(gt);
+                foreach (PlayerController controller in playersInp)
+                {
+                    controller.UpdateControls();
+                }
+            }
+            ball.Update();
+        }
+
+        public static void Draw(SpriteBatch _spriteBatch) 
+        {
+            _spriteBatch.Draw(bg, Vector2.Zero, Color.White);
+
+            foreach (Paddle player in players)
+            {
+                player.Draw(_spriteBatch);
+            }
+            ball.Draw(_spriteBatch);
+
+
+            if (showScore)
+            {
+                _spriteBatch.DrawString(Fonts.fonts[1], $"{players[0].score}", new Vector2(100, 9), Color.White);
+                _spriteBatch.DrawString(Fonts.fonts[1], $"{players[1].score}", new Vector2(205, 9), Color.White);
+            }
+
+
+            // debug info
+            if (showDebug)
+            {
+                _spriteBatch.Draw(rectDebug, screenBounds[2], Color.Red);
+                _spriteBatch.Draw(rectDebug, screenBounds[3], Color.Red);
+                _spriteBatch.Draw(rectDebug, screenBounds[0], Color.Green);
+                _spriteBatch.Draw(rectDebug, screenBounds[1], Color.Green);
+            }
+        }
+
+        public static void DrawText(SpriteBatch sp)
+        {
+
+            sp.DrawString(Fonts.fonts[0], $"BEST OF: {scoreToWin}", new Vector2(40, 40), Color.White);
+            
+        }
+    }
+}
