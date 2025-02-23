@@ -9,6 +9,7 @@ using MonoPongSuper.Script.Font;
 using System.Net.Http;
 using Microsoft.Xna.Framework.Content;
 using System.Reflection.Metadata;
+using Microsoft.Xna.Framework.Audio;
 
 namespace MonoPongSuper.Script.Scenes
 {
@@ -22,19 +23,27 @@ namespace MonoPongSuper.Script.Scenes
 
         private static Rectangle[] screenBounds = new Rectangle[4]; // Screen boundaries. 0 = Left, 1 = Right, 2 = Upper, 3 = Lower
 
-        private static Paddle[] players = new Paddle[2];
+        public readonly static Paddle[] players = new Paddle[2];
         private static PlayerController[] playersInp = new PlayerController[2];
+        private static ComputerController[] computersInp = new ComputerController[2];
+        public static bool[] isPlayerCPU = new bool[2];
         private static int[] scores = new int[2];
 
-        private static Ball ball;
+        public static Ball ball;
 
-        public static int scoreToWin;
+        public static int scoreToWin = 1;
+        private static KeyboardState prevKBState;
+
+        private static SoundEffect gameEnd;
         public static void Initialize(ContentManager cn) 
         {
             screenBounds[0] = new Rectangle(0, 0, 6, 180); // left of screen boundary ( goal )
             screenBounds[1] = new Rectangle(314, 0, 6, 180); // right of screen boundary ( goal )
             screenBounds[2] = new Rectangle(0, 0, 320, 6); // top of screen boundary
             screenBounds[3] = new Rectangle(0, 174, 320, 6); // bottom of screen boundary
+
+            Ball.LoadSounds(cn);
+            Paddle.LoadSounds(cn);
         }
 
         public static void Load(ContentManager cn) 
@@ -49,29 +58,55 @@ namespace MonoPongSuper.Script.Scenes
             Texture2D paddleImg = cn.Load<Texture2D>("image/paddleSuper");
             Texture2D ballImg = cn.Load<Texture2D>("image/ballSuper");
 
+            gameEnd = cn.Load<SoundEffect>("sound/gameEnd");
+
             float maxSpeed = 3f;
 
-            players[0] = new Paddle(paddleImg, new Vector2(10, 90), maxSpeed, screenBounds);
+            ball = new Ball(ballImg, new Vector2(160, 90), 2f, players, screenBounds, cn);
+            players[0] = new Paddle(paddleImg, new Vector2(10, 90), maxSpeed, screenBounds, cn);
+
+            computersInp[0] = new ComputerController(players[0], ball);
             playersInp[0] = new PlayerController(1, players[0]);
 
-            players[1] = new Paddle(paddleImg, new Vector2(306, 90), maxSpeed, screenBounds);
+            
+            players[1] = new Paddle(paddleImg, new Vector2(306, 90), maxSpeed, screenBounds, cn);
+            computersInp[1] = new ComputerController(players[1], ball);
             playersInp[1] = new PlayerController(2, players[1]);
-
-            ball = new Ball(ballImg, new Vector2(160, 90), 2f, players, screenBounds);
         }
 
         public static void Update(GameTime gt) 
         {
+            KeyboardState currentKBState = Keyboard.GetState();
+
+            if (currentKBState.IsKeyDown(Keys.P) && currentKBState != prevKBState)
+            {
+                CurrentGameState.PauseGame();
+            }
+            prevKBState = currentKBState;
+
+            ball.Update();
             foreach (Paddle player in players)
             {
                 player.Update(gt);
-                foreach (PlayerController controller in playersInp)
-                {
-                    controller.UpdateControls();
-                }
+
+                if (isPlayerCPU[0])
+                    computersInp[0].UpdateControls();
+                else
+                    playersInp[0].UpdateControls();
+
+                if (isPlayerCPU[1])
+                    computersInp[1].UpdateControls();
+                else
+                    playersInp[1].UpdateControls();
             }
-            ball.Update();
+            if (players[0].score == scoreToWin || players[1].score == scoreToWin) 
+            {
+                gameEnd.Play();
+                CurrentGameState.GameOver();
+            }
+            
         }
+        
 
         public static void Draw(SpriteBatch _spriteBatch) 
         {

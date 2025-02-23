@@ -122,10 +122,10 @@ public class Game1 : Game
                 Play.DrawText(_spriteBatch);
                 break;
             case GameState.Pause:
-
+                Pause.DrawText(_spriteBatch);
                 break;
             case GameState.GameOver:
-
+                GameOver.DrawText(_spriteBatch);
                 break;
         }
         _spriteBatch.End();

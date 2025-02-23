@@ -1,9 +1,11 @@
 ﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Numerics;
 using System.Text;
@@ -20,7 +22,8 @@ namespace MonoPongSuper.Script.Game
 
         // movement
         public bool[] isMoving = new bool[4]; // check for movement with 4 booleans, each corresponds to a cardinal direction
-        public bool[] hasCollided = new bool[4]; // check for collision with 4 booleans, each corresponds to a cardinal direction
+        //public int hasCollided = -1;
+        //ublic int hasPrevCollided;
 
         public Vector2 velocity = Vector2.Zero; // movement speed of player
         public float maxVelocity; // max speed of player
@@ -31,7 +34,13 @@ namespace MonoPongSuper.Script.Game
         private Rectangle[] bounds = new Rectangle[2];
         public int score;
 
-        public Paddle(Texture2D img, Vector2 pos, float speed, Rectangle[] screenBounds) // contructor
+        private ContentManager cn;
+
+        private static SoundEffect paddleCollide;
+        
+        
+
+        public Paddle(Texture2D img, Vector2 pos, float speed, Rectangle[] screenBounds, ContentManager cn) // contructor
         {
             this.img = img;
             this.pos = pos;
@@ -39,6 +48,7 @@ namespace MonoPongSuper.Script.Game
             origin = new Vector2(this.img.Width / 2, this.img.Height / 2);
             this.bounds[0] = screenBounds[2];
             this.bounds[1] = screenBounds[3];
+            this.cn = cn;
         }
 
         public Rectangle collideBox // physical representation of player, creates rect bound to player's image based on image position and size
@@ -46,26 +56,28 @@ namespace MonoPongSuper.Script.Game
             get { return new Rectangle((int)this.pos.X, (int)this.pos.Y, img.Width, img.Height); }
         }
 
+        public static void LoadSounds(ContentManager cn) 
+        {
+            paddleCollide = cn.Load<SoundEffect>("sound/paddleCollide");
+        }
+
         public void Update(GameTime gt) // update
         {
-
-            if (isMoving[0])
+            
+            if (isMoving[0]) // up
             {
-                velocity.X = (velocity.X - acceleration); //* (float)gt.ElapsedGameTime.TotalSeconds;
-                velocity.X = MathHelper.Clamp(velocity.X, -maxVelocity, maxVelocity); //* (float)gt.ElapsedGameTime.TotalSeconds;
-
-                //this.pos.X -= 5;
+                velocity.X = (velocity.X - acceleration);
+                velocity.X = MathHelper.Clamp(velocity.X, -maxVelocity, maxVelocity);
             }
-            if (isMoving[1])
+            if (isMoving[1]) // down
             {
-                velocity.X = (velocity.X + acceleration); //* (float)gt.ElapsedGameTime.TotalSeconds;
-                velocity.X = MathHelper.Clamp(velocity.X, -maxVelocity, maxVelocity); //* (float)gt.ElapsedGameTime.TotalSeconds;
-                //this.pos.X += 5;
+                velocity.X = (velocity.X + acceleration);
+                velocity.X = MathHelper.Clamp(velocity.X, -maxVelocity, maxVelocity);
             }
 
             else
             {
-                velocity.X += -Math.Sign(velocity.X) * friction; //* (float)gt.ElapsedGameTime.TotalSeconds;
+                velocity.X += -Math.Sign(velocity.X) * friction;
                 if (Math.Abs(velocity.X) <= tolerance)
                 {
                     velocity.X = 0;
@@ -76,21 +88,32 @@ namespace MonoPongSuper.Script.Game
 
             if (collideBox.Intersects(bounds[0])) 
             {
+                
                 velocity.X = 0;
                 if (collideBox.Top <= bounds[0].Bottom)
                 {
                     pos.Y = bounds[0].Bottom;
+                    
+                    
                 }
+                
             }
 
             if (collideBox.Intersects(bounds[1])) 
             {
+                
                 velocity.X = 0;
                 if (collideBox.Bottom > bounds[1].Top)
                 {
                     pos.Y = bounds[1].Top - img.Height;
+                    
+                   
                 }
+                
+
             }
+            
+
         }
 
         public void Draw(SpriteBatch sp)
