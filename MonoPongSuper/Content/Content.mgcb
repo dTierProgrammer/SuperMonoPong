@@ -41,6 +41,18 @@
 /processorParam:TextureFormat=Compressed
 /build:font/titlesmall.spritefont
 
+#begin icone2_184_icon.ico
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:icone2_184_icon.ico
+
 #begin image/1.png
 /importer:TextureImporter
 /processor:TextureProcessor
