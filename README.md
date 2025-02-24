@@ -8,10 +8,21 @@ Game Features:
 - Rectangle showing where the screen's borders are
 - Paddle acceleration and friction, enabling smoother feeling controls
 - Ball bounce angles dependent on the Paddle's velocity
-- Sounds scoring, ball collisions, etc
+- Sounds for scoring, ball collisions, etc
 - 1p, 2p, or 1p VS CPU modes (done by seperating input logic into different "controller" classes that I could then pass to a paddle)
 - Ability to set the score needed to win (max of 25)
-- Scenes / Game states dependent on if a player / cpu wins, or has paused the game
+- Scenes / Game states dependent on if a player / cpu wins, or if the game is paused
+
+Controls:
+- Left/Right (change Score To Win on title)
+- M (set score to maximum)
+- D (set score to default)
+
+- Up (P1 paddle up)
+- Down (P1 paddle down)
+- W (P2 paddle up)
+- S (P2 paddle down)
+- P (pause)
 
 History:
 - Project was built as a remake to my older, much more basic clone of pong, named "Mono Pong"
