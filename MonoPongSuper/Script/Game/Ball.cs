@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Reflection.Metadata;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -27,6 +28,10 @@ namespace MonoPongSuper.Script.Game
         private static SoundEffect ballLoss;
         private static SoundEffect score;
         private static SoundEffect paddleBounce;
+        private Paddle _paddle;
+
+        private Vector2 prevPosition;
+        private bool hasCollided;
 
         Random rng = new Random();
         float spdR;
@@ -74,6 +79,36 @@ namespace MonoPongSuper.Script.Game
             this.pos = respawnPos;
         }
 
+        public void ReverseVelocityX()
+        {
+            velocity.X *= -1;
+        }
+
+        public void ReverseVelocityY()
+        {
+            velocity.Y *= -1;
+        }
+
+        public void BounceLeft()
+        {
+            velocity.X = -Math.Abs(velocity.X);
+        }
+
+        public void BounceRight()
+        {
+            velocity.X = Math.Abs(velocity.X);
+        }
+
+        public void BounceUp()
+        {
+            velocity.Y = -Math.Abs(velocity.Y);
+        }
+
+        public void BounceDown()
+        {
+            velocity.Y = Math.Abs(velocity.Y);
+        }
+
         public void ResetVelocity() 
         {
             velocity.X = spdR;
@@ -82,53 +117,103 @@ namespace MonoPongSuper.Script.Game
 
         public void Update() 
         {
-            this.pos += velocity;
-            if (collideBox.Intersects(screenBounds[2]) || collideBox.Intersects(screenBounds[3])) 
-            {
-                velocity.Y *= -1;
-                ballBounce.Play();
-            }
-            if (collideBox.Intersects(screenBounds[0]))
+            // X Start
+            this.pos.X += velocity.X;
+            if (collideBox.Intersects(screenBounds[0])) 
             {
                 paddles[1].score++;
-                score.Play();
+                ResetPos();
+                ballLoss.Play();
             }
-            else if (collideBox.Intersects(screenBounds[1]))
+            if (collideBox.Intersects(screenBounds[1]))
             {
                 paddles[0].score++;
-                score.Play();
-            }
-            if (collideBox.Intersects(screenBounds[0]) || collideBox.Intersects(screenBounds[1]))
-            {
                 ResetPos();
                 ballLoss.Play();
             }
             foreach (Paddle paddle in paddles) 
             {
-                if (collideBox.Intersects(paddle.collideBox))
+                if (collideBox.Intersects(paddle.collideBox)) 
                 {
-                    if (collideBox.Top <= paddle.collideBox.Bottom || collideBox.Bottom >= paddle.collideBox.Top) 
-                    {
-                        velocity.Y = paddle.velocity.X;
-                        if (paddle.velocity.X == 0)
-                            velocity.Y += rng.NextInt64(-1, 1) * Math.Sign(paddle.velocity.X);
-                        velocity.Y *= -1;
-
-
-                        paddleBounce.Play();
-                    }
-                    if (collideBox.Left <= paddle.collideBox.Right || collideBox.Right >= paddle.collideBox.Left) // what happens if the ball gets behind the player?
-                    {
-                        
-                        velocity.Y = paddle.velocity.X;
-                        if (paddle.velocity.X == 0)
-                            velocity.Y += rng.NextInt64(-1, 1);
-                        velocity.X *= -1;
-                        paddleBounce.Play();
-                    }
-
+                    _paddle = paddle;
+                    hasCollided = true;
+                    break;
                 }
             }
+            if(hasCollided && collideBox.Intersects(_paddle.collideBox)) 
+            {
+                if((collideBox.Right >= _paddle.collideBox.Left) && (prevPosition.X >= _paddle.collideBox.Right))
+                { // r
+                    paddleBounce.Play();
+                    BounceRight();
+                    pos.X = prevPosition.X;
+                    velocity.Y = (collideBox.Center.Y - _paddle.collideBox.Center.Y) / 6f;
+                    Math.Clamp(velocity.Y, -spdR, spdR);
+                    hasCollided = false;
+                }
+                if((collideBox.Left <= _paddle.collideBox.Right) && (prevPosition.X <= _paddle.collideBox.Left)) 
+                { // l
+                    paddleBounce.Play();
+                    BounceLeft();
+                    pos.X = prevPosition.X;
+                    velocity.Y = (collideBox.Center.Y - _paddle.collideBox.Center.Y) / 6f;
+                    Math.Clamp(velocity.Y, -spdR, spdR);
+                    hasCollided = false;
+                }
+            }
+
+            // X End
+
+            // Y Start
+            this.pos.Y += velocity.Y;
+            if (collideBox.Intersects(screenBounds[2])) //up
+            {
+                if(prevPosition.Y > screenBounds[2].Bottom) 
+                {
+                    pos.Y = screenBounds[2].Bottom;
+                }
+                BounceDown();
+                ballBounce.Play(); 
+            }
+
+            if (collideBox.Intersects(screenBounds[3])) //down
+            {
+                if(prevPosition.Y < screenBounds[3].Top - collideBox.Height) 
+                {
+                    pos.Y = screenBounds[3].Top - collideBox.Height;
+                }
+                BounceUp();
+                ballBounce.Play();
+            }
+
+            foreach (Paddle paddle in paddles)
+            {
+                if (collideBox.Intersects(paddle.collideBox))
+                {
+                    _paddle = paddle;
+                    hasCollided = true;
+                    break;
+                }
+            }
+
+            if (hasCollided && collideBox.Intersects(_paddle.collideBox))
+            {
+                if ((collideBox.Top <= _paddle.collideBox.Bottom) && (prevPosition.Y <= _paddle.collideBox.Bottom))
+                {
+                    paddleBounce.Play();
+                    BounceUp();
+                    pos.Y = _paddle.collideBox.Top - collideBox.Height;
+                }
+
+                if((collideBox.Bottom >= _paddle.collideBox.Top) && (prevPosition.Y >= _paddle.collideBox.Top)) 
+                {
+                    paddleBounce.Play();
+                    BounceDown();
+                    pos.Y = _paddle.collideBox.Bottom;
+                }
+            }
+            // Y End
+            prevPosition = pos;
         }
 
         public void Draw(SpriteBatch sp) 

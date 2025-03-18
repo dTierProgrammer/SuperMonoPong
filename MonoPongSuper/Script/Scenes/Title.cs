@@ -120,7 +120,7 @@ namespace MonoPongSuper.Script.Scenes
             sp.DrawString(Fonts.fonts[2], "ENTER - VS HUMAN", new Vector2(340, 350), Color.White);
             sp.DrawString(Fonts.fonts[2], "L/R SHIFT - VS CPU", new Vector2(310, 420), Color.White);
             sp.DrawString(Fonts.fonts[2], $"SCORE TO WIN - <{gamesToWin}>", new Vector2(305, 490), Color.White);
-            sp.DrawString(Fonts.fonts[1], "By: D TIER PROGRAMMER\nVersion: 1.0", new Vector2(12, 650), Color.White);
+            sp.DrawString(Fonts.fonts[1], "By: DTierProgrammer\nVersion: 1.0.4", new Vector2(12, 650), Color.White);
         }
     }
 }

@@ -139,7 +139,7 @@ namespace MonoPongSuper.Script.Scenes
         public static void DrawText(SpriteBatch sp)
         {
 
-            sp.DrawString(Fonts.fonts[0], $"BEST OF: {scoreToWin}", new Vector2(40, 40), Color.White);
+            sp.DrawString(Fonts.fonts[0], $"Best Of: {scoreToWin}", new Vector2(40, 40), Color.White);
             
         }
     }

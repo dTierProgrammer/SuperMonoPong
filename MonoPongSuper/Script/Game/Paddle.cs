@@ -27,7 +27,7 @@ namespace MonoPongSuper.Script.Game
 
         public Vector2 velocity = Vector2.Zero; // movement speed of player
         public float maxVelocity; // max speed of player
-        private const float acceleration = 1f; // rate of change for velocity
+        private const float acceleration = .4f; // rate of change for velocity
         private const float friction = acceleration * 0.5f; // opposes acceleration
         private const float tolerance = friction * 0.9f; // dictates when velocity is low enough to sit Player still
 
