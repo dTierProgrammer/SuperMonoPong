@@ -7,7 +7,7 @@ Uses (rudamentary) OOP principles.
 Game Features:
 - Rectangle showing where the screen's borders are
 - Paddle acceleration and friction, enabling smoother feeling controls
-- Ball bounce angles dependent on the Paddle's velocity
+- Ball bounce angles dependent on where it hits the paddle
 - Sounds for scoring, ball collisions, etc
 - 1p, 2p, or 1p VS CPU modes (done by seperating input logic into different "controller" classes that I could then pass to a paddle)
 - Ability to set the score needed to win (max of 25)
