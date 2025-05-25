@@ -14,6 +14,8 @@ using Microsoft.Xna.Framework.Input;
 using MonoPongSuper.Script.Game;
 using MonoPongSuper.Script.Sound;
 using System.ComponentModel.Design;
+using MonoPongSuper.Script.Global;
+using Microsoft.Xna.Framework.Audio;
 
 namespace MonoPongSuper.Script.Scenes
 {
@@ -24,23 +26,22 @@ namespace MonoPongSuper.Script.Scenes
         static Texture2D title;
         public static int gamesToWin = 5;
 
+        public static SoundEffect selection;
+        public static SoundEffect select;
+
 
         static KeyboardState prevKBState;
 
-        public static void Initialize(ContentManager cn)
+        public static void Load()
         {
+            bg = GetContent.GetTexture("image/titleBG");
+            title = GetContent.GetTexture("image/titleTex");
+            Fonts.fonts[0] = GetContent.GetFont("font/debug");
+            Fonts.fonts[1] = GetContent.GetFont("font/title");
+            Fonts.fonts[2] = GetContent.GetFont("font/titlesmall");
 
-            LoadMenuSounds.LoadMenuSFX(cn);
-            
-        }
-
-        public static void Load(ContentManager cn)
-        {
-            bg = cn.Load<Texture2D>("image/titleBG");
-            title = cn.Load<Texture2D>("image/titleTex");
-            Fonts.fonts[0] = cn.Load<SpriteFont>("font/debug");
-            Fonts.fonts[1] = cn.Load<SpriteFont>("font/title");
-            Fonts.fonts[2] = cn.Load<SpriteFont>("font/titlesmall");
+            selection = GetContent.GetSound("sound/selection");
+            select = GetContent.GetSound("sound/select");
         }
 
         public static void Update()
@@ -52,22 +53,22 @@ namespace MonoPongSuper.Script.Scenes
             if (currentKBstate.IsKeyDown(Keys.Right) && currentKBstate != prevKBState  && gamesToWin < 25) 
             {
                 gamesToWin++;
-                LoadMenuSounds.selection.Play();
+                selection.Play();
             }
             if (currentKBstate.IsKeyDown(Keys.Left) && currentKBstate != prevKBState && gamesToWin > 1)
             {
                 gamesToWin--;
-                LoadMenuSounds.selection.Play();
+                selection.Play();
             }
             if (currentKBstate.IsKeyDown(Keys.M) && currentKBstate != prevKBState)
             {
                 gamesToWin = 25;
-                LoadMenuSounds.selection.Play();
+                selection.Play();
             }
             if (currentKBstate.IsKeyDown(Keys.D) && currentKBstate != prevKBState)
             {
                 gamesToWin = 5;
-                LoadMenuSounds.selection.Play();
+                selection.Play();
             }
             if (currentKBstate.IsKeyDown(Keys.Enter) && currentKBstate != prevKBState)
             {
@@ -75,7 +76,7 @@ namespace MonoPongSuper.Script.Scenes
                 Play.isPlayerCPU[0] = false;
                 Play.isPlayerCPU[1] = false;
                 hasBeenPlayed = true;
-                LoadMenuSounds.select.Play();
+                select.Play();
                 CurrentGameState.GoToGame();
             }
             if (currentKBstate.IsKeyDown(Keys.LeftShift) && currentKBstate != prevKBState)
@@ -84,7 +85,7 @@ namespace MonoPongSuper.Script.Scenes
                 Play.isPlayerCPU[0] = false;
                 Play.isPlayerCPU[1] = true;
                 hasBeenPlayed = true;
-                LoadMenuSounds.select.Play();
+                select.Play();
                 CurrentGameState.GoToGame();
             }
             if (currentKBstate.IsKeyDown(Keys.RightShift) && currentKBstate != prevKBState)
@@ -93,7 +94,7 @@ namespace MonoPongSuper.Script.Scenes
                 Play.isPlayerCPU[0] = true;
                 Play.isPlayerCPU[1] = false;
                 hasBeenPlayed = true;
-                LoadMenuSounds.select.Play();
+                select.Play();
                 CurrentGameState.GoToGame();
             }
             if ((currentKBstate.IsKeyDown(Keys.LeftAlt) && currentKBstate != prevKBState) || 
@@ -103,7 +104,7 @@ namespace MonoPongSuper.Script.Scenes
                 Play.isPlayerCPU[0] = true;
                 Play.isPlayerCPU[1] = true;
                 hasBeenPlayed = true;
-                LoadMenuSounds.select.Play();
+                select.Play();
                 CurrentGameState.GoToGame();
             }
             prevKBState = currentKBstate;
@@ -117,10 +118,13 @@ namespace MonoPongSuper.Script.Scenes
 
         public static void DrawText(SpriteBatch sp)
         {
-            sp.DrawString(Fonts.fonts[2], "ENTER - VS HUMAN", new Vector2(340, 350), Color.White);
-            sp.DrawString(Fonts.fonts[2], "L/R SHIFT - VS CPU", new Vector2(310, 420), Color.White);
-            sp.DrawString(Fonts.fonts[2], $"SCORE TO WIN - <{gamesToWin}>", new Vector2(305, 490), Color.White);
-            sp.DrawString(Fonts.fonts[1], "By: DTierProgrammer\nVersion: 1.0.4", new Vector2(12, 650), Color.White);
+            string menuElement1 = "Enter - VS Other Player";
+            sp.DrawString(Fonts.fonts[2], menuElement1, new Vector2(Fonts.fonts[2].MeasureString(menuElement1).X / 2, 350), Color.White);
+            string menuElement2 = "L/R Shift -  VS CPU";
+            sp.DrawString(Fonts.fonts[2], menuElement2, new Vector2(Fonts.fonts[2].MeasureString(menuElement2).X / 2, 420), Color.White);
+            string menuElement3 = $"Score To Win - <{gamesToWin}>";
+            sp.DrawString(Fonts.fonts[2], menuElement3, new Vector2(Fonts.fonts[2].MeasureString(menuElement3).X / 2, 490), Color.White);
+            sp.DrawString(Fonts.fonts[1], "By: DTierProgrammer\nVersion: 1.0.4.1", new Vector2(12, 650), Color.White);
         }
     }
 }

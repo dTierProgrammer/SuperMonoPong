@@ -20,12 +20,12 @@ namespace MonoPongSuper.Script.Controller
 
         public void UpdateControls() 
         {
-            if (ball.pos.Y < paddle.pos.Y + (paddle.img.Height / 2))
+            if (ball.pos.Y < paddle.pos.Y + (paddle.collideBox.Height / 2))
                 paddle.isMoving[0] = true;
             else
                 paddle.isMoving[0] = false;
 
-            if(ball.pos.Y > paddle.pos.Y + (paddle.img.Height / 2))
+            if(ball.pos.Y > paddle.pos.Y + (paddle.collideBox.Height / 2))
                 paddle.isMoving[1] = true;
             else
                 paddle.isMoving[1] = false;

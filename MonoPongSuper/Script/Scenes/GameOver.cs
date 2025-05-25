@@ -5,6 +5,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using MonoPongSuper.Script.Font;
 using MonoPongSuper.Script.Game;
+using MonoPongSuper.Script.Global;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -24,20 +25,16 @@ namespace MonoPongSuper.Script.Scenes
         static SoundEffect gameEnd;
 
         static KeyboardState prevKBstate;
-        public static void Initialize(ContentManager cn)
-        {
 
-        }
-
-        public static void Load(ContentManager cn)
+        public static void Load()
         {
-            bg = cn.Load<Texture2D>("image/titleBG");
-            p1Win = cn.Load<Texture2D>("image/user_p1Win");
-            p2Win = cn.Load<Texture2D>("image/user_p2Win");
-            userWin = cn.Load<Texture2D>("image/user_Win");
-            userLoss = cn.Load<Texture2D>("image/user_loss");
-            cpuWin = cn.Load<Texture2D>("image/user_game_over");
-            gameEnd = cn.Load<SoundEffect>("sound/gameEnd");
+            bg = GetContent.GetTexture("image/titleBG");
+            p1Win = GetContent.GetTexture("image/user_p1Win");
+            p2Win = GetContent.GetTexture("image/user_p2Win");
+            userWin = GetContent.GetTexture("image/user_Win");
+            userLoss = GetContent.GetTexture("image/user_loss");
+            cpuWin = GetContent.GetTexture("image/user_game_over");
+            gameEnd = GetContent.GetSound("sound/gameEnd");
         }
 
         public static void Update()

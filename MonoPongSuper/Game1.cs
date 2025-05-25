@@ -9,6 +9,7 @@ using MonoPongSuper.Script.Font;
 using System.Net.Http;
 using Microsoft.Xna.Framework.Content;
 using MonoPongSuper.Script.Scenes;
+using MonoPongSuper.Script.Global;
 
 namespace MonoPongSuper;
 
@@ -24,7 +25,7 @@ public class Game1 : Game
         _graphics = new GraphicsDeviceManager(this);
         Content.RootDirectory = "Content";
         IsMouseVisible = true;
-        Window.Title = "Super Mono Pong 1.0.4";
+        Window.Title = "Super Mono Pong 1.0.4.1";
 
         _graphics.PreferredBackBufferWidth = 1280;
         _graphics.PreferredBackBufferHeight = 720;
@@ -38,11 +39,7 @@ public class Game1 : Game
     {
         // TODO: Add your initialization logic here
 
-        
-        Title.Initialize(Content);
-        Play.Initialize(Content);
-        Pause.Initialize(Content);
-        GameOver.Initialize(Content);
+        GetContent.Initialize(this);
         base.Initialize();
     }
 
@@ -51,11 +48,11 @@ public class Game1 : Game
         _spriteBatch = new SpriteBatch(GraphicsDevice);
 
         // TODO: use this.Content to load your game content here
-    
-        Title.Load(Content);
-        Play.Load(Content);
-        Pause.Load(Content);
-        GameOver.Load(Content);
+        
+        Title.Load();
+        Play.Load();
+        Pause.Load();
+        GameOver.Load();
     }
 
     protected override void Update(GameTime gameTime)

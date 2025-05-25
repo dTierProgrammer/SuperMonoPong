@@ -1,9 +1,11 @@
 ﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Graphics.PackedVector;
 using Microsoft.Xna.Framework.Input;
 using MonoPongSuper.Script.Font;
+using MonoPongSuper.Script.Global;
 using MonoPongSuper.Script.Sound;
 using System;
 using System.Collections.Generic;
@@ -19,15 +21,13 @@ namespace MonoPongSuper.Script.Scenes
         static Texture2D gamePause;
         static Texture2D bg;
         static KeyboardState prevKBState;
-        public static void Initialize(ContentManager cn)
-        {
-            LoadMenuSounds.LoadMenuSFX(cn);
-        }
+        public static SoundEffect select;
 
-        public static void Load(ContentManager cn)
+        public static void Load()
         {
-            bg = cn.Load<Texture2D>("image/titleBG");
-            gamePause = cn.Load<Texture2D>("image/paused");
+            bg = GetContent.GetTexture("image/titleBG");
+            gamePause = GetContent.GetTexture("image/paused");
+            select = GetContent.GetSound("sound/select");
         }
 
         public static void Update()
@@ -35,12 +35,12 @@ namespace MonoPongSuper.Script.Scenes
             KeyboardState currentKBState = Keyboard.GetState();
             if (currentKBState.IsKeyDown(Keys.Enter) && currentKBState != prevKBState) 
             {
-                LoadMenuSounds.select.Play();
+                select.Play();
                 CurrentGameState.GoToGame();
             }
             if (currentKBState.IsKeyDown(Keys.Back) && currentKBState != prevKBState)
             {
-                LoadMenuSounds.select.Play();
+                select.Play();
                 CurrentGameState.GoToTitle();
             }
             prevKBState = currentKBState;
