@@ -37,14 +37,14 @@ namespace MonoPongSuper.Script.Scenes
             gameEnd = GetContent.GetSound("sound/gameEnd");
         }
 
-        public static void Update()
+        public static void Update(GameTime gt)
         {
             KeyboardState currentKBstate = Keyboard.GetState();
             if (currentKBstate.IsKeyDown(Keys.Enter) && currentKBstate != prevKBstate) 
             {
                 Play.players[0].score = 0;
                 Play.players[1].score = 0;
-                Reset.ResetGame();
+                Reset.ResetGame(gt);
                 
                 CurrentGameState.GoToGame();
             }
@@ -52,7 +52,7 @@ namespace MonoPongSuper.Script.Scenes
             {
                 Play.players[0].score = 0;
                 Play.players[1].score = 0;
-                Reset.ResetGame();
+                Reset.ResetGame(gt);
                 
                 CurrentGameState.GoToTitle();
             }

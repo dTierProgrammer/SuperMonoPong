@@ -63,7 +63,7 @@ public class Game1 : Game
         switch (CurrentGameState.currentState)
         {
             case GameState.Title:
-                Title.Update();
+                Title.Update(gameTime);
                 break;
             case GameState.Game:
                 Play.Update(gameTime);
@@ -72,7 +72,7 @@ public class Game1 : Game
                 Pause.Update();
                 break;
             case GameState.GameOver:
-                GameOver.Update();
+                GameOver.Update(gameTime);
                 break;
         }
         base.Update(gameTime);
@@ -117,7 +117,7 @@ public class Game1 : Game
                 Title.DrawText(_spriteBatch);
                 break;
             case GameState.Game:
-                Play.DrawText(_spriteBatch);
+                Play.DrawText(_spriteBatch, gameTime);
                 break;
             case GameState.Pause:
                 Pause.DrawText(_spriteBatch);

@@ -77,6 +77,18 @@
 /processorParam:TextureFormat=Color
 /build:image/ballSuper.png
 
+#begin image/debuggg.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:image/debuggg.png
+
 #begin image/gamefield.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -148,6 +160,18 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:image/titleTex.png
+
+#begin image/TURBO.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:image/TURBO.png
 
 #begin image/user_cpu_win.png
 /importer:TextureImporter

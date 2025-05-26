@@ -24,6 +24,7 @@ namespace MonoPongSuper.Script.Scenes
         public static bool hasBeenPlayed;
         static Texture2D bg;
         static Texture2D title;
+        static Texture2D turboTitle;
         public static int gamesToWin = 5;
 
         public static SoundEffect selection;
@@ -36,6 +37,7 @@ namespace MonoPongSuper.Script.Scenes
         {
             bg = GetContent.GetTexture("image/titleBG");
             title = GetContent.GetTexture("image/titleTex");
+            turboTitle = GetContent.GetTexture("image/TURBO");
             Fonts.fonts[0] = GetContent.GetFont("font/debug");
             Fonts.fonts[1] = GetContent.GetFont("font/title");
             Fonts.fonts[2] = GetContent.GetFont("font/titlesmall");
@@ -44,11 +46,11 @@ namespace MonoPongSuper.Script.Scenes
             select = GetContent.GetSound("sound/select");
         }
 
-        public static void Update()
+        public static void Update(GameTime gt)
         {
             Play.players[0].score = 0;
             Play.players[1].score = 0;
-            Reset.ResetGame();
+            Reset.ResetGame(gt);
             KeyboardState currentKBstate = Keyboard.GetState();
             if (currentKBstate.IsKeyDown(Keys.Right) && currentKBstate != prevKBState  && gamesToWin < 25) 
             {
@@ -114,6 +116,7 @@ namespace MonoPongSuper.Script.Scenes
         {
             sp.Draw(bg, Vector2.Zero, Color.White);
             sp.Draw(title, new Vector2(160, 40), null, Color.White, 0, new Vector2(title.Width / 2, title.Height / 2), 1f, SpriteEffects.None, 0);
+            sp.Draw(turboTitle, new Vector2(260, 70), null, Color.White, 0, new Vector2(turboTitle.Width / 2, turboTitle.Height / 2), 1f, SpriteEffects.None, 0);
         }
 
         public static void DrawText(SpriteBatch sp)

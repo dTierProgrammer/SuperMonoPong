@@ -57,7 +57,7 @@ namespace MonoPongSuper.Script.Scenes
 
             float maxSpeed = 3f;
 
-            ball = new Ball(ballImg, new Vector2(160, 90), 2f, gameObjects);
+            ball = new Ball(ballImg, new Vector2(160, 90), 100f, gameObjects);
             players[0] = new Paddle(paddleImg, new Vector2(10, 90), maxSpeed, gameObjects);
 
             computersInp[0] = new ComputerController(players[0], ball);
@@ -131,11 +131,11 @@ namespace MonoPongSuper.Script.Scenes
             }
         }
 
-        public static void DrawText(SpriteBatch sp)
+        public static void DrawText(SpriteBatch sp, GameTime gt)
         {
 
             sp.DrawString(Fonts.fonts[0], $"Best Of: {scoreToWin}", new Vector2(40, 40), Color.White);
-            
+
         }
     }
 }

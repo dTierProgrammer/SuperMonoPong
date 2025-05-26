@@ -29,21 +29,22 @@ namespace MonoPongSuper.Script.Game
         private static SoundEffect paddleBounce = GetContent.GetSound("sound/paddleBounce");
 
         private Vector2 prevPosition;
+        public Vector2 projPos;
 
         float spdR;
-        public Ball(Texture2D img, Vector2 pos, float speed, List<Sprite> collisionGroup): base(img, pos) // 100 overload challenge !!!
+        float Reset;
+        public Ball(Texture2D img, Vector2 pos, float speed, List<Sprite> collisionGroup) : base(img, pos) // 100 overload challenge !!!
         {
             respawnPos = pos;
             velocity = new Vector2(speed, speed);
             spdR = speed;
-
-            this.cn = cn;
-
+            Reset = speed;
             this.collisionGroup = collisionGroup;
         }
 
-        protected void ResetPos() 
+        protected void ResetPos(GameTime gt)
         {
+            velocity = new Vector2(spdR * (float)gt.ElapsedGameTime.TotalSeconds, 0);
             velocity *= new Vector2(-1, -1);
             this.pos = respawnPos;
         }
@@ -68,21 +69,29 @@ namespace MonoPongSuper.Script.Game
             velocity.Y = Math.Abs(velocity.Y);
         }
 
-        public void ResetVelocity() 
+        public void ResetVelocity(GameTime gt)
         {
-            velocity.X = spdR;
-            velocity.Y = spdR;
+            spdR = Reset;
+            velocity.X = spdR * (float)gt.ElapsedGameTime.TotalSeconds;
+            velocity.Y = 0;
         }
 
-        private static void GoalHelper(Goal goal) 
+        private static void GoalHelper(Goal goal)
         {
             goal.Score();
         }
 
-        protected void CheckCollisionsX() 
+        protected float ProjectPositionX(GameTime gt) 
+        {
+            float projectedX = pos.X + velocity.X * (float)gt.ElapsedGameTime.TotalSeconds;
+            return projectedX;
+        }
+
+        protected void CheckCollisionsX(GameTime gt) 
         {
             foreach (Sprite gameObject in collisionGroup) 
             {
+                
                 if (gameObject != this && collideBox.Intersects(gameObject.collideBox)) 
                 {
                     if (gameObject is Paddle) 
@@ -113,21 +122,27 @@ namespace MonoPongSuper.Script.Game
                     }
                 }
             }
+            prevPosition.X = pos.X;
         }
 
-        protected void CheckCollisionsY() 
+        protected float ProjectPositionY(GameTime gt)
         {
+            float projectedY = pos.Y + velocity.Y * (float)gt.ElapsedGameTime.TotalSeconds;
+            return projectedY;
+        }
+
+        protected void CheckCollisionsY(GameTime gt) 
+        {
+
             foreach (Sprite gameObject in collisionGroup)
             {
+
                 if (collideBox.Intersects(gameObject.collideBox))
                 {
-                    if (gameObject == this)
-                        continue;
-                    if (prevPosition.Y > gameObject.collideBox.Y)
+                    Vector2 intersection = GetIntersections.LineRectReturnIntersection((float)collideBox.Center.X, (float)collideBox.Center.Y, projPos.X, projPos.Y, gameObject.collideBox);
+                    if (intersection != new Vector2(-1000, -1000))
                     {
-                        pos.Y = gameObject.collideBox.Bottom;
-                        BounceDown();
-                        ballBounce.Play();
+                        intersections.Add(intersection);
                     }
                     else
                     {
@@ -135,26 +150,115 @@ namespace MonoPongSuper.Script.Game
                         BounceUp();
                         ballBounce.Play();
                     }
-                    if (gameObject is Paddle) 
-                    {
-                        velocity.X = (collideBox.Center.X - gameObject.collideBox.Center.X) / 6f;
-                        Math.Clamp(velocity.X, -spdR, spdR);
-                    }
                     break;
                 }
+                
             }
-            
+            prevPosition.Y = pos.Y;
+        }
+
+        protected Vector2 ProjectPosition(GameTime gt) 
+        {
+            Vector2 projectedPosition = new Vector2(ProjectPositionX(gt), ProjectPositionY(gt));
+            return projectedPosition;
+        }
+
+        protected bool CheckCollisionsLineSegment(GameTime gt) 
+        {
+            foreach (Sprite gameObject in collisionGroup) 
+            {
+                // left
+                if (gameObject != this && GetIntersections.DoesLineIntersectLine(
+                    pos, 
+                    ProjectPosition(gt), 
+                    new Vector2(gameObject.collideBox.X, gameObject.collideBox.Y), 
+                    new Vector2(gameObject.collideBox.X, gameObject.collideBox.Y + gameObject.collideBox.Height))) 
+                {
+                    
+                    pos.X = gameObject.collideBox.Left - collideBox.Width;
+
+                    if (gameObject is Goal) 
+                    {
+                        GoalHelper((Goal)gameObject);
+                        ResetPos();
+                        ballLoss.Play();
+                    }
+                    else if (gameObject is Paddle) 
+                    {
+                        BounceLeft();
+                        velocity.Y = (collideBox.Center.Y - gameObject.collideBox.Center.Y) / 6f;
+                        Math.Clamp(velocity.Y, -spdR, spdR);
+                    }
+                    else if (gameObject is Boundary) 
+                    {
+                        BounceLeft();
+                    }
+
+                    return true;
+                }
+
+                // right
+                if (gameObject != this && GetIntersections.DoesLineIntersectLine(
+                    pos,
+                    ProjectPosition(gt),
+                    new Vector2(gameObject.collideBox.X + gameObject.collideBox.Width, gameObject.collideBox.Y),
+                    new Vector2(gameObject.collideBox.X + gameObject.collideBox.Width, gameObject.collideBox.Y + gameObject.collideBox.Height))) 
+                {
+                    pos.X = gameObject.collideBox.Left + 1;
+
+                    if (gameObject is Goal)
+                    {
+                        GoalHelper((Goal)gameObject);
+                        ResetPos();
+                        ballLoss.Play();
+                    }
+                    else if (gameObject is Paddle)
+                    {
+                        BounceRight();
+                        velocity.Y = (collideBox.Center.Y - gameObject.collideBox.Center.Y) / 6f;
+                        Math.Clamp(velocity.Y, -spdR, spdR);
+                    }
+                    else if (gameObject is Boundary)
+                    {
+                        BounceRight();
+                    }
+
+                    return true;
+                }
+                
+                // up
+                if (gameObject != this && GetIntersections.DoesLineIntersectLine(
+                    pos,
+                    ProjectPosition(gt),
+                    new Vector2(gameObject.collideBox.X, gameObject.collideBox.Y),
+                    new Vector2(gameObject.collideBox.X + gameObject.collideBox.Width, gameObject.collideBox.Y + gameObject.collideBox.Height))) 
+                {
+                    pos.Y = gameObject.collideBox.Top - collideBox.Height;
+                    BounceUp();
+                    return true;
+                }
+
+                // down
+                if (gameObject != this && GetIntersections.DoesLineIntersectLine(
+                    pos,
+                    ProjectPosition(gt),
+                    new Vector2(gameObject.collideBox.X, gameObject.collideBox.Y + gameObject.collideBox.Height),
+                    new Vector2(gameObject.collideBox.X + gameObject.collideBox.Width, gameObject.collideBox.Y + gameObject.collideBox.Height))) 
+                {
+                    pos.Y = gameObject.collideBox.Bottom;
+                    BounceDown();
+                    return true;
+                }
+            }
+            return false;
         }
 
         public override void Update(GameTime gt)
         {
-            this.pos.X += velocity.X;
-            CheckCollisionsX();
-            prevPosition.X = pos.X;
-
-            this.pos.Y += velocity.Y;
-            CheckCollisionsY();
-            prevPosition.Y = pos.Y;
+            CheckCollisionsLineSegment(gt);
+            this.pos += velocity;
+            ProjectPosition(gt);
+            
         }
     }
 }
